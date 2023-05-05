@@ -14,10 +14,33 @@ struct FindNotSpace
 	bool operator()(char c){return !::isspace(c);}		
 };
 
+struct FirstPipe
+{
+	bool operator()(char c){return (c == '|');}
+};
+
 struct FindSpace
 {
 	bool operator()(char c){return ::isspace(c);}
 };
+
+struct FindNonDigit
+{
+	bool operator()(char c){return !::isdigit(c);}		
+};
+
+typedef struct	s_DataRep
+{	
+	s_DataRep()
+	{
+		strRepresentation = "";
+		intRepresentation = -1;
+	}
+
+	int				intRepresentation;
+	std::string		strRepresentation;
+}	DataRep;
+
 
 class BitcoinExchange
 {
@@ -38,6 +61,9 @@ class BitcoinExchange
 		void	start_parsing(const std::ifstream& file);
 		void	trimSpacesFromStartEnd(std::string&);
 		void	validateDate(std::string);
+		void	getIntRepresentations(DataRep&, DataRep&, DataRep&);
+		bool	isNotNumber(std::string	line);
+
 
 	private:
 		std::map<std::string, double>	data__;

@@ -7,6 +7,17 @@ BitcoinExchange::BitcoinExchange(const std::string&	fn)
 	fillDatabase();
 }
 
+void	checkPipeExistence(std::string line)
+{
+	std::string::iterator it1 = std::find_if(line.begin(), line.end(), FirstPipe());
+	std::string::iterator it2 = std::find_if(++it1, line.end(), FirstPipe());
+	if (it1 == line.end() || it2 != line.end())
+	{
+		std::string	ErrMsg = "Invalid Pipe at: " + line;
+		throw (std::runtime_error(ErrMsg.c_str()));
+	}
+}
+
 void	BitcoinExchange::run(const std::string&	input)
 {
 	std::ifstream	inFile(input);
@@ -20,6 +31,7 @@ void	BitcoinExchange::run(const std::string&	input)
 	{
 		try
 		{
+			checkPipeExistence(line);
 			std::stringstream	ss(line);
 			std::string			date ;
 			std::string			value ;
@@ -27,15 +39,6 @@ void	BitcoinExchange::run(const std::string&	input)
 			std::getline(ss, date, '|');
 			std::getline(ss, value, '|');
 			validateDate(date);
-			// // if (0)
-			// // {
-
-			// // }
-			// // else
-			// // {
-			// 	std::string	errorMsg = line + ": Invalid date\n";
-			// 	throw	std::runtime_error(errorMsg.c_str());
-			// }
 		}
 		catch(const std::exception& e)
 		{
@@ -46,21 +49,59 @@ void	BitcoinExchange::run(const std::string&	input)
 	
 }
 
+bool	BitcoinExchange::isNotNumber(std::string	line)
+{
+	std::string::iterator it = std::find_if(line.begin(), line.end(), FindNonDigit());
+	if (it == line.end())
+		return	(false);
+	return	(true);
+		
+}
+
+
+void	BitcoinExchange::getIntRepresentations(DataRep& year, DataRep& month, DataRep& day)
+{
+	
+	// std::stringstream	ss(year.strRepresentation);
+	// ss >> year.intRepresentation;
+	// std::cout << year.strRepresentation << " " << month.strRepresentation << day.strRepresentation << std::endl;
+	if (isNotNumber(year.strRepresentation) || isNotNumber(month.strRepresentation) || isNotNumber(day.strRepresentation))
+	{
+		std::string	errMsg = "Invalid year/month/day : " + year.strRepresentation + "-" + month.strRepresentation + "-" + day.strRepresentation + "\n";
+		throw	std::runtime_error(errMsg.c_str());
+	}
+	
+
+
+	// std::string::iterator start	= std::find_if(line.begin(), line.end(), FindNotSpace());
+	// std::string::iterator end	= std::find_if(start, line.end(), FindSpace());
+	// std::string(start, end).swap(line);
+
+}
+
+
 void	BitcoinExchange::validateDate(std::string	date)
 {
 	std::string	errorMsg = date + ": Invalid date\n";
-	std::string		year;
-	std::string		month;
-	std::string		day;
-	std::ifstream	ss(date);
+	DataRep		year;
+	DataRep		month;
+	DataRep		day;
+	// std::cout <<"==" << date << "==" <<std::endl;
+	std::stringstream	ss(date);
 	if (date[4] != '-' || date[7] != '-')
 		throw	std::runtime_error(errorMsg.c_str());
-	std::getline(ss, year, '-');
-	std::getline(ss, month, '-');
-	std::getline(ss, day, '-');
-	trimSpacesFromStartEnd(year);
-	trimSpacesFromStartEnd(month);
-	trimSpacesFromStartEnd(day);
+
+	std::getline(ss, year.strRepresentation, '-');
+	std::getline(ss, month.strRepresentation, '-');
+	std::getline(ss, day.strRepresentation, '-');
+	
+	trimSpacesFromStartEnd(year.strRepresentation);
+	trimSpacesFromStartEnd(month.strRepresentation);
+	trimSpacesFromStartEnd(day.strRepresentation);
+	// std::cout << "."<< year.strRepresentation << ". ." << month.strRepresentation << ". ."<< day.strRepresentation << "." << std::endl;
+	
+	getIntRepresentations(year, month, day);
+	
 		///TODO:validation of year, month, day
 	
 	

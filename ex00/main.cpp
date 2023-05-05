@@ -1,17 +1,5 @@
 #include "BitcoinExchange.hpp"
 
-std::string trim(std::string to_trim)
-{
-	std::string ret;
-
-	for (size_t i = 0; i < to_trim.size(); ++i)
-	{
-		if (!(::isspace(to_trim[i])))
-			ret.push_back(to_trim[i]);
-	}
-	std::cout << ret << "*\n";
-	return ret;
-}
 
 int main(int argc, char **argv)
 {
@@ -23,7 +11,7 @@ int main(int argc, char **argv)
 
 	try
 	{
-		BitcoinExchange	b("hi");
+		BitcoinExchange	b(argv[1]);
 		b.run(argv[1]);
 	}
 	catch(const std::exception& e)
@@ -31,8 +19,6 @@ int main(int argc, char **argv)
 		std::cerr << e.what() << '\n';
 	}
 		
-	std::string a =      "      ba     rev        ";
-	trim(a);
 
 	// std::cout << "*" << trim(a) << "*\n";
 
