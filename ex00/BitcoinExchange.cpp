@@ -9,14 +9,57 @@ BitcoinExchange::BitcoinExchange(const std::string&	fn)
 
 void	checkPipeExistence(std::string line)
 {
-	std::string::iterator it1 = std::find_if(line.begin(), line.end(), FirstPipe());
-	std::string::iterator it2 = std::find_if(++it1, line.end(), FirstPipe());
-	if (it1 == line.end() || it2 != line.end())
-	{
-		std::string	ErrMsg = "Invalid Pipe at: " + line;
+	std::string	ErrMsg = "Invalid Pipe at: " + line;
+	if (line.find('|') != line.rfind('|'))
 		throw (std::runtime_error(ErrMsg.c_str()));
+	
+	size_t	idx =line.find('|');
+	if (idx == std::string::npos || !std::isspace(line[idx - 1]) || !std::isspace(line[idx + 1]))
+		throw (std::runtime_error(ErrMsg.c_str()));	
+}
+
+void BitcoinExchange::validate_value(std::string& value)
+{
+	trimSpacesFromStartEnd(value);
+	std::string cp(value);
+	std::string	errMsg = "Invalid value : " + cp;
+	if (cp.find('.') == cp.rfind('.') && cp.find('.') != std::string::npos)
+	{
+		cp.erase(cp.find('.'), 1);
+	}
+	if (isNotNumber(cp) || cp.length() == 0)
+		throw std::runtime_error(errMsg);
+	double	v;
+	std::stringstream	ss(cp);
+	ss >> v;
+	if (v < 0)
+	{	
+		throw (std::runtime_error("Error: not a positive number."));
+	}
+	if (v > 1000)
+	{	
+		throw (std::runtime_error("Error: too large number."));
 	}
 }
+
+void	BitcoinExchange::printValueFromDb(std::string&	date, std::string& v)
+{
+	std::stringstream	ss(v);
+	double				value;
+	ss >> value;
+	Database::iterator	it = data__.find(date);
+	if (it == data__.end())
+	{
+		it = data__.lower_bound(date);
+		if (it != data__.begin())
+			std::advance(it, -1);
+		else
+			throw (std::runtime_error("Not found in database"));
+	}
+	std::cout<< date << " => " << value  << " = " << value * it->second<< std::endl;
+	
+}
+
 
 void	BitcoinExchange::run(const std::string&	input)
 {
@@ -39,54 +82,78 @@ void	BitcoinExchange::run(const std::string&	input)
 			std::getline(ss, date, '|');
 			std::getline(ss, value, '|');
 			validateDate(date);
+			validate_value(value);
+			printValueFromDb(date, value);
 		}
 		catch(const std::exception& e)
 		{
 			std::cerr << e.what() << '\n';
 		}
-		
 	}
 	
 }
 
 bool	BitcoinExchange::isNotNumber(std::string	line)
 {
-	std::string::iterator it = std::find_if(line.begin(), line.end(), FindNonDigit());
+	std::string::iterator	start = line.begin();
+	if (line[0] == '-' || line[0] == '+')
+		++start;
+	std::string::iterator it = std::find_if(start, line.end(), FindNonDigit());
 	if (it == line.end())
 		return	(false);
-	return	(true);
-		
+	return	(true);	
 }
 
 
 void	BitcoinExchange::getIntRepresentations(DataRep& year, DataRep& month, DataRep& day)
 {
 	
-	// std::stringstream	ss(year.strRepresentation);
-	// ss >> year.intRepresentation;
-	// std::cout << year.strRepresentation << " " << month.strRepresentation << day.strRepresentation << std::endl;
 	if (isNotNumber(year.strRepresentation) || isNotNumber(month.strRepresentation) || isNotNumber(day.strRepresentation))
 	{
-		std::string	errMsg = "Invalid year/month/day : " + year.strRepresentation + "-" + month.strRepresentation + "-" + day.strRepresentation + "\n";
+		std::string	errMsg = "Invalid year/month/day : " + year.strRepresentation + "-" + month.strRepresentation + "-" + day.strRepresentation;
 		throw	std::runtime_error(errMsg.c_str());
 	}
-	
+	std::stringstream	ys(year.strRepresentation);
+	std::stringstream	ms(month.strRepresentation);
+	std::stringstream	ds(day.strRepresentation);
+	ys >> year.intRepresentation;
+	ms >> month.intRepresentation;
+	ds >> day.intRepresentation;
+}
 
-
-	// std::string::iterator start	= std::find_if(line.begin(), line.end(), FindNotSpace());
-	// std::string::iterator end	= std::find_if(start, line.end(), FindSpace());
-	// std::string(start, end).swap(line);
-
+bool IsLeapYear(int year)
+{
+	return ((year % 400 == 0 || ( year % 4 == 0 && year % 100 != 0 )) ? true : false);
 }
 
 
-void	BitcoinExchange::validateDate(std::string	date)
+void	BitcoinExchange::validate_ymd(DataRep& y, DataRep& m, DataRep& d)
 {
+	int year = y.intRepresentation;
+	int month = m.intRepresentation;
+	int day = d.intRepresentation;
+	std::string	errMsg = "Invalid year/month/day1 : " + y.strRepresentation + "-" + m.strRepresentation + "-" + d.strRepresentation;
+	
+	if (year < 2009  || month < 1 || month > 12 || day < 1 || day > 31)
+		throw std::runtime_error(errMsg);
+
+	MONTH30 months[] = {APR, JUN, SEP, NOV};
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (months[i] == month && day == 31)
+			throw std::runtime_error(errMsg);
+	}
+	if (month == FEB && day > (28 + IsLeapYear(year)))
+		throw std::runtime_error(errMsg);
+}
+
+void	BitcoinExchange::validateDate(std::string&	date)
+{
+	trimSpacesFromStartEnd(date);
 	std::string	errorMsg = date + ": Invalid date\n";
 	DataRep		year;
 	DataRep		month;
 	DataRep		day;
-	// std::cout <<"==" << date << "==" <<std::endl;
 	std::stringstream	ss(date);
 	if (date[4] != '-' || date[7] != '-')
 		throw	std::runtime_error(errorMsg.c_str());
@@ -98,13 +165,8 @@ void	BitcoinExchange::validateDate(std::string	date)
 	trimSpacesFromStartEnd(year.strRepresentation);
 	trimSpacesFromStartEnd(month.strRepresentation);
 	trimSpacesFromStartEnd(day.strRepresentation);
-	// std::cout << "."<< year.strRepresentation << ". ." << month.strRepresentation << ". ."<< day.strRepresentation << "." << std::endl;
-	
 	getIntRepresentations(year, month, day);
-	
-		///TODO:validation of year, month, day
-	
-	
+	validate_ymd(year, month, day);
 }
 
 
@@ -145,22 +207,6 @@ void	BitcoinExchange::fillDatabase()
 	// printData();
 }
 
-void	BitcoinExchange::openFile()
-{
-	std::ifstream	file(fileName);
-	if (file.is_open())
-	{
-		try
-		{
-			start_parsing(file);
-		}
-		catch (const std::exception& e)
-		{
-			std::cerr << e.what() << '\n';
-		}
-		
-	}
-}
 void	BitcoinExchange::printData() 
 {
 	std::cout.precision(2);
@@ -177,8 +223,3 @@ void	BitcoinExchange::trimSpacesFromStartEnd(std::string& line)
 	std::string(start, end).swap(line);
 }
 
-
-void	BitcoinExchange::start_parsing(const std::ifstream& file)
-{
-	(void) file;
-}

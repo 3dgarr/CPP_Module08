@@ -11,22 +11,22 @@
 
 struct FindNotSpace
 {
-	bool operator()(char c){return !::isspace(c);}		
+	bool operator()(char c){ return !::isspace(c); }
 };
 
 struct FirstPipe
 {
-	bool operator()(char c){return (c == '|');}
+	bool operator()(char c){ return (c == '|'); }
 };
 
 struct FindSpace
 {
-	bool operator()(char c){return ::isspace(c);}
+	bool operator()(char c){ return ::isspace(c); }
 };
 
 struct FindNonDigit
 {
-	bool operator()(char c){return !::isdigit(c);}		
+	bool operator()(char c){ return !::isdigit(c); }
 };
 
 typedef struct	s_DataRep
@@ -41,6 +41,16 @@ typedef struct	s_DataRep
 	std::string		strRepresentation;
 }	DataRep;
 
+enum	MONTH30 
+{
+	FEB = 2,
+	APR = 4,
+	JUN = 6,
+	SEP = 9,
+	NOV = 11
+};
+
+typedef std::map<std::string, double> Database;
 
 class BitcoinExchange
 {
@@ -54,23 +64,20 @@ class BitcoinExchange
 		void	run(const	std::string&);
 
 	private:
-		void	openFile();
 		bool	isNotValidHeader(std::string&);
 		void	printData();
 		void	fillDatabase();
-		void	start_parsing(const std::ifstream& file);
 		void	trimSpacesFromStartEnd(std::string&);
-		void	validateDate(std::string);
+		void	validateDate(std::string&);
+		void	validate_ymd(DataRep&, DataRep&, DataRep&);
 		void	getIntRepresentations(DataRep&, DataRep&, DataRep&);
 		bool	isNotNumber(std::string	line);
-
+		void 	validate_value(std::string&);
+		void	printValueFromDb(std::string&, std::string&);
 
 	private:
-		std::map<std::string, double>	data__;
-		std::string						fileName;
-
-		
-
+		Database		data__;
+		std::string		fileName;
 };
 
 

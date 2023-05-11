@@ -18,9 +18,7 @@ int main(int argc, char **argv)
 	{
 		std::cerr << e.what() << '\n';
 	}
-		
-
-	// std::cout << "*" << trim(a) << "*\n";
+	
 
 
 	return 0;
