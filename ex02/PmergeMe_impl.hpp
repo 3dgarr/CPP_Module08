@@ -3,13 +3,6 @@
 
 #include "PmergeMe.hpp"
 
-template <typename It>
-void printRange(It startIt, It endIt) 
-{
-    std::copy(startIt, endIt, std::ostream_iterator<typename It::value_type>(std::cout, " "));
-    std::cout << std::endl;
-}
-
 template<typename T>
 T next(T it, typename std::iterator_traits<T>::difference_type n = 1) 
 {
@@ -24,10 +17,29 @@ T prev(T it, typename std::iterator_traits<T>::difference_type n = -1)
     return it;
 }
 
+template <typename It>
+void printRange(It startIt, It endIt) 
+{
+	if (std::distance(startIt, endIt) > 7)
+	{
+    	std::copy(startIt, next(startIt, 7), std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
+		std::cout << "[...]\t" ;
+    	std::copy(prev(endIt, -2), endIt, std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
+		std::cout << std::endl;
+
+	}
+	else
+	{
+		std::copy(startIt, endIt, std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
+		std::cout << std::endl;
+	}
+}
+
+
 template <typename ForwardIt>
 void PmergeMe::insertionSort(ForwardIt start, ForwardIt end) 
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	// std::cout << __PRETTY_FUNCTION__ << std::endl;
     typedef typename std::iterator_traits<ForwardIt>::value_type  value_type;
     for (ForwardIt it = start; it != end; std::advance(it, 1)) 
 	{
@@ -86,7 +98,7 @@ void	PmergeMe::mergeInsertionSort(ForwardIt	start, ForwardIt end)
 		insertionSort(start, end);
         return;
     }
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	// std::cout << __PRETTY_FUNCTION__ << std::endl;
 	ForwardIt	mid = next(start, std::distance(start, end) / 2);
 	mergeInsertionSort(start, mid);
 	mergeInsertionSort(mid, end);
