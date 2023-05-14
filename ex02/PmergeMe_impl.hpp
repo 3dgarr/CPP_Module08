@@ -4,21 +4,21 @@
 #include "PmergeMe.hpp"
 
 template<typename T>
-T next(T it, typename std::iterator_traits<T>::difference_type n = 1) 
+T	next(T it, typename std::iterator_traits<T>::difference_type n = 1) 
 {
     std::advance(it, n);
     return it;
 }
 
 template<typename T>
-T prev(T it, typename std::iterator_traits<T>::difference_type n = -1) 
+T	prev(T it, typename std::iterator_traits<T>::difference_type n = -1) 
 {
     std::advance(it, n);
     return it;
 }
 
 template <typename It>
-void printRange(It startIt, It endIt) 
+void	printRange(It startIt, It endIt) 
 {
 	if (std::distance(startIt, endIt) > 7)
 	{

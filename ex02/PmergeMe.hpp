@@ -26,7 +26,7 @@ struct String2Number
 	int	operator()(const std::string& str)
 	{
 		std::stringstream	ss(str);
-		int number;
+		int					number;
 		ss >> number ;
 		return (number); 
 	}

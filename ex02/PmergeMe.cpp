@@ -2,20 +2,25 @@
 
 
 PmergeMe::PmergeMe()
-	:	numbers_line("")
+	:	numbers_line(""),
+		string_numbers(0)
 {}
 
 PmergeMe::~PmergeMe()
 {}
 
 PmergeMe::PmergeMe(const PmergeMe& rhs)
-{
-	(void)rhs;
-}
+	:	numbers_line(rhs.numbers_line),
+		string_numbers(rhs.string_numbers)
+{}
+
 PmergeMe& PmergeMe::operator=(const PmergeMe& rhs)
 {
 	if (this != &rhs)
-	{}
+	{
+		numbers_line = rhs.numbers_line;
+		string_numbers = rhs.string_numbers;
+	}
 	return (*this);
 }
 
