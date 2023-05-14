@@ -35,7 +35,6 @@ void printRange(It startIt, It endIt)
 	}
 }
 
-
 template <typename ForwardIt>
 void PmergeMe::insertionSort(ForwardIt start, ForwardIt end) 
 {
@@ -54,12 +53,36 @@ void PmergeMe::insertionSort(ForwardIt start, ForwardIt end)
     }
 }
 
-template<typename	ForwardIt>
-void	PmergeMe::mergeRange(ForwardIt& start, ForwardIt& mid, ForwardIt& end)
+template<typename	RandIt>
+void	PmergeMe::mergeRange(RandIt start, RandIt mid, RandIt end, std::bidirectional_iterator_tag t)
 {
-    typedef typename std::iterator_traits<ForwardIt>::value_type 	value_type;
-	typedef	std::vector<value_type>									Vector;
-	typedef	typename Vector::iterator								Iterator;
+	// std::cout << __PRETTY_FUNCTION__ << std::endl;
+	(void)t;//Needs only to determine the code
+    typedef typename std::iterator_traits<RandIt>::value_type 	value_type;
+	typedef	std::list<value_type>								List;
+	typedef	 typename List::iterator							AsocIt;
+
+	List	leftSub(std::distance(start, mid));
+	std::copy(start, mid, leftSub.begin());
+
+	List	rightSub(std::distance(mid, end));
+	std::copy(mid, end, rightSub.begin());
+	
+	AsocIt	leftIt	= leftSub.begin();
+	AsocIt	rightIt	= rightSub.begin();
+	RandIt	curIt	= start;
+
+	mainMerging(leftIt, leftSub.end(), rightIt, rightSub.end(), curIt);
+}
+
+template<typename	RandIt>
+void	PmergeMe::mergeRange(RandIt start, RandIt mid, RandIt end, std::random_access_iterator_tag t)
+{
+	// std::cout << __PRETTY_FUNCTION__ << std::endl;
+	(void)t;//Needs only to determine the function
+    typedef typename std::iterator_traits<RandIt>::value_type 	value_type;
+	typedef	std::vector<value_type>								Vector;
+	typedef	typename Vector::iterator							AsocIt;
 
 	Vector	leftSub(std::distance(start, mid));
 	std::copy(start, mid, leftSub.begin());
@@ -67,32 +90,39 @@ void	PmergeMe::mergeRange(ForwardIt& start, ForwardIt& mid, ForwardIt& end)
 	Vector	rightSub(std::distance(mid, end));
 	std::copy(mid, end, rightSub.begin());
 	
-	Iterator	leftIt = leftSub.begin();
-	Iterator	rightIt = rightSub.begin();
-	ForwardIt	curIt = start;
+	AsocIt	leftIt	= leftSub.begin();
+	AsocIt	rightIt	= rightSub.begin();
+	RandIt	curIt	= start;
 
-    while (leftIt != leftSub.end() && rightIt != rightSub.end()) 
+	mainMerging(leftIt, leftSub.end(), rightIt, rightSub.end(), curIt);
+}
+
+
+template<typename AsocIt, typename Iterator>
+void	PmergeMe::mainMerging(AsocIt	leftIt, AsocIt	leftEnd, AsocIt	rightIt, AsocIt	rightEnd, Iterator	currentIt)
+{
+	while (leftIt != leftEnd && rightIt != rightEnd) 
 	{
         if (*leftIt <= *rightIt) 
 		{
-            *curIt = *leftIt;
+            *currentIt = *leftIt;
 			std::advance(leftIt, 1);
         } 
 		else 
 		{
-            *curIt = *rightIt;
+            *currentIt = *rightIt;
 			std::advance(rightIt, 1);
         }
-		std::advance(curIt, 1);
+		std::advance(currentIt, 1);
     }
-    std::copy(leftIt, leftSub.end(), curIt);
-    std::copy(rightIt, rightSub.end(), curIt);
-
+    std::copy(leftIt, leftEnd, currentIt);
+    std::copy(rightIt, rightEnd, currentIt);
 }
 
 template<typename	ForwardIt>
 void	PmergeMe::mergeInsertionSort(ForwardIt	start, ForwardIt end)
 {
+	typename std::iterator_traits<ForwardIt>::iterator_category type;
     if (std::distance(start, end) < 16) 
 	{
 		insertionSort(start, end);
@@ -102,9 +132,10 @@ void	PmergeMe::mergeInsertionSort(ForwardIt	start, ForwardIt end)
 	ForwardIt	mid = next(start, std::distance(start, end) / 2);
 	mergeInsertionSort(start, mid);
 	mergeInsertionSort(mid, end);
-	mergeRange(start, mid, end);
+	mergeRange(start, mid, end, type);
 }
 
 
 
 # endif	//PMERGE_ME_IMPL_HPP
+

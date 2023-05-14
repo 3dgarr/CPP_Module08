@@ -47,22 +47,27 @@ class PmergeMe
 	private:
 		template<typename	ForwardIt>
 		void	mergeInsertionSort(ForwardIt	start, ForwardIt end);
+		
 		void	get_sequance_as_str(int, char**);
 		void	validate_sequance();
 		bool	isNotNumber(std::string	line);
 		void	sort_vector();
 		void	sort_list();
 		void	sort_deque();
-
 		double	get_time_diff(struct timeval &t1, struct timeval &t2);
 
 
 		template<typename	ForwardIt>
 		void	insertionSort(ForwardIt	start, ForwardIt end);
 
-		template<typename	ForwardIt>
-		void	mergeRange(ForwardIt& start, ForwardIt& mid, ForwardIt& end);
+		template<typename	RandIt>
+		void	mergeRange(RandIt start, RandIt mid, RandIt end, std::random_access_iterator_tag t);
+		
+		template<typename	RandIt>
+		void	mergeRange(RandIt start, RandIt mid, RandIt end, std::bidirectional_iterator_tag t);
 
+		template<typename AsocIt, typename Iterator>
+		void	mainMerging(AsocIt	leftIt, AsocIt	leftEnd, AsocIt	rightIt, AsocIt	rightEnd, Iterator	currentIt);
 
 	private:
 		std::string					numbers_line;

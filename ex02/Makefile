@@ -2,7 +2,7 @@ CXX = c++
 NAME = pmergeMe
 SRCS = $(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
+CXXFLAGS =  -Wall -Wextra -Werror -std=c++98 -g3
 
 %.o:%.cpp $(wildcard *.hpp)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -31,3 +31,4 @@ RED = \033[1;31m
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
 DEFAULT = \033[0m
+#  `shuf -i 1-1000 -n 3000 | tr "\n" " " `
