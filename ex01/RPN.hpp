@@ -17,11 +17,10 @@ class RPN
 		RPN& operator=(const RPN&);
 		~RPN();
 	
-	public:
+	private:
 		typedef	std::stack<double>				OperandStack;
 		typedef	OperandStack::value_type		Value_type;	
 		typedef	char							Operator;
-		typedef	std::string::reverse_iterator	RForwardIt;
 		typedef	std::string::iterator			ForwardIt;
 	
 	private:

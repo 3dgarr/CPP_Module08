@@ -7,6 +7,26 @@ BitcoinExchange::BitcoinExchange(const std::string&	fn)
 	fillDatabase();
 }
 
+BitcoinExchange::BitcoinExchange(const BitcoinExchange& rhs)
+{
+	data__ = rhs.data__;
+	fileName = rhs.fileName;	
+}
+
+BitcoinExchange&	BitcoinExchange::operator=(const BitcoinExchange& rhs)
+{
+	if (this != &rhs)
+	{
+		data__ = rhs.data__;
+		fileName = rhs.fileName;	
+	}
+	return (*this);
+}
+
+BitcoinExchange::~BitcoinExchange()
+{}
+
+
 void	checkPipeExistence(std::string line)
 {
 	std::string	ErrMsg = "Invalid Pipe at: " + line;
@@ -57,19 +77,18 @@ void	BitcoinExchange::printValueFromDb(std::string&	date, std::string& v)
 			throw (std::runtime_error("Not found in database"));
 	}
 	std::cout<< date << " => " << value  << " = " << value * it->second<< std::endl;
-	
 }
 
 
 void	BitcoinExchange::run(const std::string&	input)
 {
-	std::ifstream	inFile(input);
+	std::ifstream	inFile(input.c_str());
 	std::string		line;
 	if (!inFile.is_open())
-		throw	std::runtime_error("Can not open input file\n");
+		throw	std::runtime_error("Can not open input file");
 	std::getline(inFile, line);
 	if (isNotValidHeader(line))
-		throw	std::runtime_error("Invalid column names\n");
+		throw	std::runtime_error("Invalid column names");
 	while (std::getline(inFile, line))
 	{
 		try
@@ -90,7 +109,6 @@ void	BitcoinExchange::run(const std::string&	input)
 			std::cerr << e.what() << '\n';
 		}
 	}
-	
 }
 
 bool	BitcoinExchange::isNotNumber(std::string	line)
@@ -106,8 +124,7 @@ bool	BitcoinExchange::isNotNumber(std::string	line)
 
 
 void	BitcoinExchange::getIntRepresentations(DataRep& year, DataRep& month, DataRep& day)
-{
-	
+{	
 	if (isNotNumber(year.strRepresentation) || isNotNumber(month.strRepresentation) || isNotNumber(day.strRepresentation))
 	{
 		std::string	errMsg = "Invalid year/month/day : " + year.strRepresentation + "-" + month.strRepresentation + "-" + day.strRepresentation;
@@ -126,13 +143,12 @@ bool IsLeapYear(int year)
 	return ((year % 400 == 0 || ( year % 4 == 0 && year % 100 != 0 )) ? true : false);
 }
 
-
 void	BitcoinExchange::validate_ymd(DataRep& y, DataRep& m, DataRep& d)
 {
 	int year = y.intRepresentation;
 	int month = m.intRepresentation;
 	int day = d.intRepresentation;
-	std::string	errMsg = "Invalid year/month/day1 : " + y.strRepresentation + "-" + m.strRepresentation + "-" + d.strRepresentation;
+	std::string	errMsg = "Invalid year/month/day : " + y.strRepresentation + "-" + m.strRepresentation + "-" + d.strRepresentation;
 	
 	if (year < 2009  || month < 1 || month > 12 || day < 1 || day > 31)
 		throw std::runtime_error(errMsg);
@@ -150,7 +166,7 @@ void	BitcoinExchange::validate_ymd(DataRep& y, DataRep& m, DataRep& d)
 void	BitcoinExchange::validateDate(std::string&	date)
 {
 	trimSpacesFromStartEnd(date);
-	std::string	errorMsg = date + ": Invalid date\n";
+	std::string	errorMsg = date + ": Invalid date";
 	DataRep		year;
 	DataRep		month;
 	DataRep		day;
@@ -204,7 +220,6 @@ void	BitcoinExchange::fillDatabase()
 	}
 	if (data__.size() == 0)
 		throw	std::runtime_error("Empty file");
-	// printData();
 }
 
 void	BitcoinExchange::printData() 

@@ -2,7 +2,7 @@ CXX = c++
 NAME = pmergeMe
 SRCS = $(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
-CXXFLAGS =  -Wall -Wextra -Werror -std=c++98 -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 
 
 %.o:%.cpp $(wildcard *.hpp)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

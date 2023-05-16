@@ -128,8 +128,6 @@ void	PmergeMe::run(int argc, char** argv)
 bool	PmergeMe::isNotNumber(std::string	line)
 {
 	std::string::iterator	start = line.begin();
-	if (line[0] == '+' || line[0] == '-')
-		++start;
 	std::string::iterator it = std::find_if(start, line.end(), FindNonDigit());
 	if (it == line.end())
 		return	(false);

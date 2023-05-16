@@ -58,9 +58,9 @@ class BitcoinExchange
 
 	public:
 		BitcoinExchange(const std::string&);
-		// BitcoinExchange(const BitcoinExchange&);
-		// BitcoinExchange	&	operator=(const BitcoinExchange&);
-		// ~BitcoinExchange();
+		BitcoinExchange(const BitcoinExchange&);
+		BitcoinExchange	&	operator=(const BitcoinExchange&);
+		~BitcoinExchange();
 		void	run(const	std::string&);
 
 	private:
