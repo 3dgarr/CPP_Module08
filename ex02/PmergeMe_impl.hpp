@@ -22,9 +22,9 @@ void	printRange(It startIt, It endIt)
 {
 	if (std::distance(startIt, endIt) > 7)
 	{
-    	std::copy(startIt, next(startIt, 7), std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
+    	std::copy(startIt, ::next(startIt, 7), std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
 		std::cout << "[...]\t" ;
-    	std::copy(prev(endIt, -2), endIt, std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
+    	std::copy(::prev(endIt, -2), endIt, std::ostream_iterator<typename It::value_type>(std::cout, "\t"));
 		std::cout << std::endl;
 
 	}
@@ -44,9 +44,9 @@ void PmergeMe::insertionSort(ForwardIt start, ForwardIt end)
 	{
         value_type key		=	*it;
         ForwardIt sorted_it	=	it;
-        while (sorted_it != start && key < *prev(sorted_it)) 
+        while (sorted_it != start && key < *::prev(sorted_it)) 
 		{
-            *sorted_it = *(prev(sorted_it));
+            *sorted_it = *(::prev(sorted_it));
             std::advance(sorted_it, -1);
         }
         *sorted_it = key;
@@ -129,7 +129,7 @@ void	PmergeMe::mergeInsertionSort(ForwardIt	start, ForwardIt end)
         return;
     }
 	// std::cout << __PRETTY_FUNCTION__ << std::endl;
-	ForwardIt	mid = next(start, std::distance(start, end) / 2);
+	ForwardIt	mid = ::next(start, std::distance(start, end) / 2);
 	mergeInsertionSort(start, mid);
 	mergeInsertionSort(mid, end);
 	mergeRange(start, mid, end, type);
